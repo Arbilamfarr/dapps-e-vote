@@ -1,5 +1,6 @@
 const express = require('express');
 const Candidate = require('../models/Candidate');
+const { info, warn, error } = require('./../../logs/logger.js');  // Importer le logger
 
 const router = express.Router();
 
@@ -9,9 +10,11 @@ router.post('/', async (req, res) => {
     const { name, program, blockchainId } = req.body;
     const candidate = new Candidate({ name, program, blockchainId });
     await candidate.save();
+    info(`Candidate created: ${candidate.name} - ${candidate.program} - ${candidate.blockchainId}`);
     res.status(201).json(candidate);
-  } catch (error) {
-    res.status(500).json({ error: 'Error creating candidate', details: error.message });
+  } catch (err) {
+    error(`Error creating candidate: ${err.message}`);  // Log de l'erreur
+    res.status(500).json({ error: 'Error creating candidate', details: err.message });
   }
 });
 
@@ -19,9 +22,11 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const candidates = await Candidate.find();
+    info(`Fetched ${candidates.length} candidates`);  // Log d'info pour la récupération des candidats
     res.json(candidates);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching candidates', details: error.message });
+  } catch (err) {
+    error(`Error fetching candidates: ${err.message}`);  // Log de l'erreur
+    res.status(500).json({ error: 'Error fetching candidates', details: err.message });
   }
 });
 

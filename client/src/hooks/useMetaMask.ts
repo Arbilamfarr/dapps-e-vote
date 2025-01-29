@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import type { ExternalProvider } from '@metamask/providers';
 import VotingSystemABI from '../contracts/VotingSystem.json'; // Importez l'ABI du contrat
+import  {CONTRACTADDRESS}  from '../constante/constate.ts';
 
 declare global {
   interface Window {
@@ -27,8 +28,8 @@ export const useMetaMask = (): UseMetaMaskReturn => {
   const [adminAddress, setAdminAddress] = useState<string>(''); // Ajout pour l'adresse admin
   const [isAdmin, setIsAdmin] = useState<boolean>(false); // Ajout pour vérifier si l'utilisateur est admin
 
-  const networkId = '5777'; // Replace with your network ID
-  const contractAddress = VotingSystemABI.networks[networkId]?.address;
+  
+  const contractAddress = CONTRACTADDRESS;
 
   const connectWallet = async () => {
     if (!window.ethereum) {

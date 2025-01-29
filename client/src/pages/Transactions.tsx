@@ -94,6 +94,12 @@ export const Transactions = () => {
                     {parseFloat(ethers.formatEther(tx.value || '0')).toFixed(4)} ETH
                   </p>
                 </div>
+                <div>
+                  <p className="text-sm text-gray-500">Date</p>
+                  <p className="font-mono text-sm">
+                  {tx.date.toISOString().split('.')[0]}
+                  </p>
+                </div>
               </div>
             </div>
           ))}

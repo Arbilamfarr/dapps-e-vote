@@ -1,5 +1,7 @@
 import { ethers } from 'ethers';
 import VotingSystem from '../contracts/VotingSystem.json';
+import { CONTRACTADDRESS } from '../constante/constate';
+import { apiService } from './apiService';
 
 class Web3Service {
   private provider: ethers.BrowserProvider;
@@ -23,11 +25,12 @@ class Web3Service {
       this.signer = await this.provider.getSigner();
       console.log('Signer obtained:', this.signer);
 
-      const networkId = '5777'; // Replace with your network ID
-      const contractAddress = VotingSystem.networks[networkId]?.address;
+   
+     
+      const contractAddress = CONTRACTADDRESS;
 
       if (!contractAddress) {
-        throw new Error(`Contract address not found for network ID: ${networkId}`);
+        throw new Error(`Contract address not found for network `);
       }
 
       console.log(`Initializing contract with address: ${contractAddress}`);
@@ -54,6 +57,13 @@ class Web3Service {
       console.log('Transaction sent:', tx);
       const receipt = await tx.wait();
       console.log('Transaction confirmed:', receipt);
+          // Log the transaction
+          await apiService.logTransaction({
+            hash: tx.hash,
+            from: tx.from,
+            type: 'START_ELECTION',
+            details: { durationInMinutes },
+          });
       return receipt;
     } catch (error) {
       console.error('Error starting election:', error);
@@ -69,6 +79,13 @@ class Web3Service {
       console.log('Transaction sent:', tx);
       const receipt = await tx.wait();
       console.log('Transaction confirmed:', receipt);
+       // Log the transaction
+       await apiService.logTransaction({
+        hash: tx.hash,
+        from: tx.from,
+        type: 'END_ELECTION',
+        details: {},
+      });
       return receipt;
     } catch (error) {
       console.error('Error ending election:', error);
@@ -85,6 +102,13 @@ class Web3Service {
       console.log('Transaction sent:', tx);
       const receipt = await tx.wait();
       console.log('Transaction confirmed:', receipt);
+      await apiService.logTransaction({
+        hash: tx.hash,
+        from: tx.from,
+        type: 'VOTE',
+        details: { candidateId },
+      });
+
       return receipt;
     } catch (error) {
       console.error('Error voting:', error);
@@ -106,6 +130,12 @@ class Web3Service {
       // Attendre que la transaction soit minée
       const receipt = await tx.wait();
       console.log('Transaction successful:', receipt);
+      await apiService.logTransaction({
+        hash: tx.hash,
+        from: tx.from,
+        type: 'REGISTER_VOTER',
+        details: { voterAddress },
+      });
   
       return receipt;
     } catch (error: any) {
@@ -163,6 +193,12 @@ class Web3Service {
     if (!this.contract) throw new Error('Contract not initialized');
     const tx = await this.contract.addCandidate(name);
     await tx.wait();
+    await apiService.logTransaction({
+      hash: tx.hash,
+      from: tx.from,
+      type: 'ADD_CANDIDATE',
+      details: { name },
+    });
   }
   
   async getAllCandidates()  {
